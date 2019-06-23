@@ -1,0 +1,10 @@
+{
+    "kissanime": {
+        "site": "https://www.kiss-anime.ws/",
+        "name": "kissanime"
+    },
+    "mangadex": {
+        "site": "https://mangadex.org/",
+        "name": "mangadex"
+    }
+}
