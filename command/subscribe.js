@@ -17,7 +17,7 @@ let firebase = null
 let kissanimeCache = {}
 let mangadexCache = {}
 
-let cronTime = '*/15 * * * *' // prod 15 minutes
+let cronTime = '*/5 * * * *' // prod 5 minutes
 // let cronTime = '*/15 * * * * *' // dev 15 seconds
 let cron = new CronJob(cronTime, doScraping, null, false, 'UTC')
 
@@ -42,7 +42,7 @@ function handleKissAnime(ctx, query) {
     
     let checkId = animeName.split(' ')
 
-    // check if containts ' id=<number>'
+    // check if contains ' id=<number>'
     if (checkId[checkId.length - 1].match(/^id=[0-9]+$/gi)) {
         id = parseInt(checkId[checkId.length - 1].substring('id='.length)) - 1
         checkId.pop()
