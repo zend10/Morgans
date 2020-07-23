@@ -182,50 +182,6 @@ function addNewMangaDexSubscriber(ctx, mangaName) {
 }
 
 function doScraping() {
-    firebase.database().ref('kissanime').once('value').then(function(snapshot) {
-        let animeList = snapshot.val()
-        for (anime in animeList) {
-            let animeEntry = animeList[anime]
-            let options = {
-                method: 'GET',
-                url: animeEntry.link
-            }
-
-            cloudscraper(options)
-                .then(html => {
-                    let lastEp = $('.listing tr td a', html).html().trim()
-                    let lastLink = $('.listing tr td a', html).attr('href').trim()
-
-                    if (animeEntry.lastEpisode.lastEpisode != lastEp) {
-                        for (sub in animeEntry.subscribers) {
-                            bot.telegram.sendMessage(sub, 'New episode of ' + animeEntry.name + ' is out!'+
-                                '\nWatch ' + lastEp + ' here: \n' + lastLink)
-                        }
-
-                        let updates = {}
-                        updates['/lastUpdate'] = moment().format('YYYY-MM-DD hh:mm:ss')
-                        updates['/lastEpisode'] = {
-                            lastEpisode: lastEp,
-                            link: lastLink
-                        }
-
-                        firebase.database().ref('kissanime/' + animeEntry.name).update(updates, function(err) {
-                            if (err) {
-                                console.log(err)
-                            } else {
-                                console.log(animeEntry.name + ' updated')
-                            }
-                        })
-                    } else {
-                        console.log('Same old episode: ' + animeEntry.lastEpisode.lastEpisode)
-                    }
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-        }
-    })
-
     firebase.database().ref('mangadex').once('value').then(function(snapshot) {
         let mangaList = snapshot.val()
         for (manga in mangaList) {
