@@ -14,7 +14,6 @@ let siteList = JSON.parse(fs.readFileSync(sitesPath, 'utf8'))
 
 let bot = null
 let firebase = null
-let kissanimeCache = {}
 let mangadexCache = {}
 
 let cronTime = '*/5 * * * *' // prod 5 minutes
@@ -25,161 +24,11 @@ methods.handleSubs = function(ctx, query, fb) {
     firebase = fb
     siteList = JSON.parse(fs.readFileSync(sitesPath, 'utf8'))
 
-    if (query.toLowerCase().startsWith(siteList.kissanime.name)) {
-        handleKissAnime(ctx, query)
-    } else if (query.toLowerCase().startsWith(siteList.mangadex.name)) {
+    if (query.toLowerCase().startsWith(siteList.mangadex.name)) {
         handleMangaDex(ctx, query)
     } else {
         ctx.reply('Wrong format, please consider reading /subs.')
     }
-}
-
-function handleKissAnime(ctx, query) {
-    ctx.reply('Working on it. Please wait.')
-
-    let animeName = query.substring(siteList.kissanime.name.length).trim().toLowerCase()
-    let id = -1
-    
-    let checkId = animeName.split(' ')
-
-    // check if contains ' id=<number>'
-    if (checkId[checkId.length - 1].match(/^id=[0-9]+$/gi)) {
-        id = parseInt(checkId[checkId.length - 1].substring('id='.length)) - 1
-        checkId.pop()
-        animeName = checkId.join(' ')
-
-        // check if still in cache and valid id
-        if (animeName == kissanimeCache.animeName && id < kissanimeCache.searchResult.length) {
-            // bypass searching
-            scrapeKissAnimePage(ctx, kissanimeCache.searchResult[id].link, kissanimeCache.searchResult[id].name)
-            return
-        }
-    }
-
-    let site = siteList.kissanime.site
-    let url = encodeURI(site + '?s=' + animeName)
-    scrapeKissAnimeList(ctx, url, animeName, id)
-}
-
-function scrapeKissAnimeList(ctx, url, animeName, id) {
-    let options = {
-        method: 'GET',
-        url: url
-    }
-
-    cloudscraper(options)
-        .then(html => {
-            let items = []
-
-            $('.odd > td', html).each(function(i) {
-                let thisHtml = $(this).html()
-                let item = {
-                    link: thisHtml.substring(thisHtml.indexOf('"') + 1, thisHtml.lastIndexOf('"')).trim(),
-                    name: thisHtml.substring(thisHtml.indexOf('>') + 1, thisHtml.lastIndexOf('<')).trim()
-                }
-
-                if (item.link && item.name) {
-                    items.push(item)
-                }
-            })
-
-            if (items.length == 0) {
-                ctx.reply('Can\'t find that.')
-            } else {
-                kissanimeCache = {
-                    animeName: animeName,
-                    searchResult: items
-                }
-
-                // check if id is valid
-                if (id < 0 || id >= items.length) {
-                    // if not valid
-                    let message = 'Here it is:\n'
-                    items.forEach(element => {
-                        message += items.indexOf(element) + 1 + ' - ' + element.name + '\n'
-                    });
-                    message += '\nType [!subs kissanime ' + animeName + ' id=<Number From Above>] to start subscribing.'
-                    ctx.reply(message)
-                } else {
-                    // if valid
-                    scrapeKissAnimePage(ctx, items[id].link, items[id].name)
-                }                
-            }
-        })
-        .catch(err => {
-            console.log(err)
-            ctx.reply('Something is stopping me from getting that information.')
-        })
-}
-
-function scrapeKissAnimePage(ctx, url, animeName) {
-    ctx.reply('You are subscribing to ' + animeName + '. Please wait a bit more while I\'m setting things up.')
-
-    // check if already exists in database
-    firebase.database().ref('kissanime/' + animeName).once('value').then(function(snapshot) {
-        if (snapshot.val()) {
-            // if already in database
-            let subscribers = snapshot.val().subscribers
-            if (subscribers && subscribers[ctx.chat.id]) {
-                // if already a subscriber
-                ctx.reply('It seems you have already subscribed to ' + animeName + '.')
-            } else {
-                // add new subscriber to existing entry
-                addNewKissAnimeSubscriber(ctx, animeName)
-            }
-        } else {
-            // if new entry
-            let options = {
-                method: 'GET',
-                url: url
-            }
-        
-            cloudscraper(options)
-                .then(html => {
-                    // add new entry
-                    firebase.database().ref('kissanime/' + animeName).set({
-                        name: animeName,
-                        link: url,
-                        subscribers: '',
-                        lastEpisode: {
-                            lastEpisode: $('.listing tr td a', html).html().trim(),
-                            link: $('.listing tr td a', html).attr('href').trim()
-                        },
-                        lastUpdate: moment().format('YYYY-MM-DD hh:mm:ss')
-                    }, function(error) {
-                        if (error) {
-                            console.log(err)
-                            ctx.reply('Something is stopping me from getting that information.')
-                        } else {
-                            // add subscriber to new entry
-                            addNewKissAnimeSubscriber(ctx, animeName)
-                        }
-                    })
-                })
-                .catch(err => {
-                    console.log(err)
-                    ctx.reply('Something is stopping me from getting that information.')
-                })
-        }
-    })
-}
-
-function addNewKissAnimeSubscriber(ctx, animeName) {
-    firebase.database().ref('kissanime/' + animeName + '/subscribers/' + ctx.chat.id).set({
-        id: ctx.chat.id,
-        name: ctx.chat.first_name
-    }, function(error) {
-        if (error) {
-            console.log(err)
-            ctx.reply('Something is stopping me from getting that information.')
-        } else {
-            ctx.reply('You have been successfully subscribed to ' + animeName + '.')
-        }
-    })
-
-    firebase.database().ref('subscribers/' + ctx.chat.id + '/kissanime/' + animeName).set({
-        name: animeName
-    })
 }
 
 function handleMangaDex(ctx, query) {

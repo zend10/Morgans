@@ -1,18 +1,15 @@
-It's a bit lengthy here, but this is what I'm here for. Please stick with me. I can help inform you whenever the latest episode or chapter of your favorite anime or manga is released. What do you want to do?
+It's a bit lengthy here, but this is what I'm here for. Please stick with me. I can help inform you whenever the latest chapter of your favorite manga is released. What do you want to do?
 
 To see your subscriptions, type [!mysubs].
 
-To search for the anime/manga you want to subscribe, type [!subs <Anime Streaming or Manga Reading Website> <Series Name>].
-Example: [!subs kissanime One Piece] or [!subs mangadex One Piece].
+To search for the manga you want to subscribe, type [!subs <Manga Reading Website> <Series Name>].
+Example: [!subs mangadex One Piece].
 
-Once you've got the search result, to start subscribing, type [!subs <Anime Streaming or Manga Reading Website> <Series Name> id=<ID from search result>].
-Example: [!subs kissanime One Piece id=8] or [!subs mangadex One Piece id=2].
-
-Here is the list of anime streaming website that is available to subscribe right now:
-[kissanime]
+Once you've got the search result, to start subscribing, type [!subs <Manga Reading Website> <Series Name> id=<ID from search result>].
+Example: [!subs mangadex One Piece id=2].
 
 Here is the list of manga reading website that is available to subscribe right now:
 [mangadex]
 
-To stop subscribing, type [!unsubs <Anime Streaming or Manga Reading Website> id=<ID from !mysubs>].
-Example: [!unsubs kissanime id=1] or [!unsubs mangadex id=1].
+To stop subscribing, type [!unsubs <Manga Reading Website> id=<ID from !mysubs>].
+Example: [!unsubs mangadex id=1].
