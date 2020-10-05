@@ -13,14 +13,14 @@
         "cloudscraper": "^4.6.0",
         "cron": "^1.8.2",
         "dotenv": "^8.2.0",
-        "firebase": "^6.6.2",
+        "firebase": "^7.22.0",
         "jikan-node": "^1.2.1",
-        "moment": "^2.27.0",
-        "pm2": "^3.5.2",
+        "moment": "^2.29.0",
+        "pm2": "^4.5.0",
         "request": "^2.88.2",
         "telegraf": "^3.38.0"
     },
     "devDependencies": {
-        "nodemon": "^1.19.4"
+        "nodemon": "^2.0.4"
     }
 }
