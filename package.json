@@ -15,7 +15,7 @@
         "dotenv": "^8.2.0",
         "firebase": "^7.22.0",
         "jikan-node": "^1.2.1",
-        "moment": "^2.29.0",
+        "moment": "^2.29.2",
         "pm2": "^4.5.0",
         "request": "^2.88.2",
         "telegraf": "^3.38.0"
